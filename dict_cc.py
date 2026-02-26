@@ -7,9 +7,12 @@ import re
 class DictLine(BaseModel):
     source: str 
     target: str
+    raw_source: str
+    raw_target: str
     pos: str
     tags: str
-    gender: Optional[Literal["m", "f", "n"]]
+    genders: list[Literal["m", "f", "n"]]
+    curly_tags: list[str]
 
 def filter_line(line: str) -> bool:
     if line[0] == '#':
@@ -18,32 +21,61 @@ def filter_line(line: str) -> bool:
         return False
     return True
 
+def parse_square_brackets(string: str):
+    matches = re.findall(r'\[([^\]]*)\]', string)
+    cleaned = re.sub(r'\[[^\]]*\]', '', string)
+    return cleaned, matches
+ 
+def parse_curly_brackets(string: str):
+    matches = re.findall(r'\{([^}]*)\}', string)
+    cleaned = re.sub(r'\{[^}]*\}', '', string)
+    return cleaned, matches
+
+def parse_triangle_brackets(string: str):
+    matches = re.findall(r'<([^>]*)>', string)
+    cleaned = re.sub(r'<[^>]*>', '', string)
+    return cleaned, matches
+
+def parse_round_brackets(string: str):
+    matches = re.findall(r'\(([^)]*)\)', string)
+    cleaned = re.sub(r'\([^)]*\)', '', string)
+    return cleaned, matches
+
 def parse_brackets(string: str):
-    matches_curly = re.findall(r'\{([^}]*)\}', string)
-    cleaned_curly = re.sub(r'\{[^}]*\}', '', string)
+    cleaned, round_matches = parse_round_brackets(string)
+    cleaned, square_matches = parse_square_brackets(cleaned)
+    cleaned, triangle_matches = parse_triangle_brackets(cleaned)
+    cleaned, curly_matches = parse_curly_brackets(cleaned)
     
-    matches_square = re.findall(r'\[([^\]]*)\]', cleaned_curly)
-    cleaned_square = re.sub(r'\[[^\]]*\]', '', cleaned_curly)
-    
-    return cleaned_square, matches_curly, matches_square
-    
+    return cleaned,round_matches,square_matches,triangle_matches,curly_matches
+
 def parse_line(line: str) -> DictLine:
     parts = line.split("\t")
-    source = parts[0]
-    target = parts[1]
+    raw_source = parts[0]
+    raw_target = parts[1]
     pos = parts[2]
     tags = parts[3] 
-
-    source, gender, other_tags = parse_brackets(source)
-    target, _, _ = parse_brackets(target)
-    gender = gender[0] if gender else None
-    tags = tags + ",".join(other_tags)
+    
+    source, round_matches, square_matches, triangle_matches, curly_matches = parse_brackets(raw_source)
+    
+    target, _, _, _, _ = parse_brackets(raw_target)
+    genders = list([ct for ct in curly_matches if ct in ['m', 'f', 'n']])
+    curly_tags = list([ct for ct in curly_matches if ct not in ['m', 'f', 'n']])
+    tags = tags + ",".join(round_matches + square_matches + triangle_matches)
+    
+    source = source.strip()
+    target = target.strip()
+    tags = tags.strip()
+    
     return DictLine(
         source = source,
         target=target,
+        raw_source=raw_source,
+        raw_target=raw_target,
         pos=pos,
         tags=tags,
-        gender=None
+        genders=genders,
+        curly_tags=curly_tags,
     ) 
     
 with open("german_to_english_dict_cc.txt") as dictcc_file:
