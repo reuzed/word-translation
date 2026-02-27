@@ -81,5 +81,12 @@ def parse_line(line: str) -> DictLine:
 with open("german_to_english_dict_cc.txt") as dictcc_file:
     contents = dictcc_file.readlines()
     contents = filter(filter_line, contents)
-    contents = map(parse_line, contents)
-    print(list(contents)[1000:1040])
+    dict_lines = map(parse_line, contents)
+    simple_dict = dict({
+        line.source.lower().strip(): line.target for line in dict_lines
+    })
+    print(list(simple_dict.values())[2000:2040])
+
+def g_to_e(word: str) -> str:
+    return simple_dict.get(word, word)
+    
