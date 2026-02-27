@@ -85,8 +85,8 @@ with open("german_to_english_dict_cc.txt") as dictcc_file:
     simple_dict = dict({
         line.source.lower().strip(): line.target for line in dict_lines
     })
-    print(list(simple_dict.values())[2000:2040])
+    print(list(simple_dict.items())[2000:2040])
 
 def g_to_e(word: str) -> str:
-    return simple_dict.get(word, word)
+    return simple_dict.get(word.lower().strip(), word)
     

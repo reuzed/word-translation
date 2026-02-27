@@ -7,7 +7,8 @@ if __name__ == "__main__":
     with open("extract1.txt") as ex:
         ex = ex.read()
     print(ex)
-    for word in ex.split():
-        print(word, "|", g_to_e(word))
-    # print(" ".join([g_to_e(word) for word in ex.split()]))
+    print("\n")
+    # for word in ex.split():
+    #     print(word, "|", g_to_e(word))
+    print(" ".join([g_to_e(word) for word in ex.split()]))
         
