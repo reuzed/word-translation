@@ -1,0 +1,17 @@
+[
+  {
+    "file": "extracts/das_urteil_eine_geschichte.txt",
+    "start_line": 67,
+    "end_line": 540
+  },
+  {
+    "file": "extracts/der_struwwelpeter.txt",
+    "start_line": 50,
+    "end_line": 711
+  },
+  {
+    "file": "extracts/drei_erzaehlungen_fuer_junge_maedchen.txt",
+    "start_line": 65,
+    "end_line": 9444
+  }
+]
